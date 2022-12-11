@@ -20,8 +20,8 @@ def augmentAruco(bbox, id, img, imgAugment, drawId = False):
     #define as corners do marcador encontrado
     tl = bbox[0][0][0], bbox[0][0][1]
     tr = bbox[0][1][0], bbox[0][1][1]
-    bl = bbox[0][2][0], bbox[0][2][1]
-    br = bbox[0][3][0], bbox[0][3][1]
+    br = bbox[0][2][0], bbox[0][2][1]
+    bl = bbox[0][3][0], bbox[0][3][1]
 
     h, w, c = imgAugment.shape
     pts1 = np.array([tl, tr, br, bl])
@@ -35,7 +35,7 @@ def augmentAruco(bbox, id, img, imgAugment, drawId = False):
 
 def main():
     video = cv.VideoCapture('images/video.mp4')
-    imgAugment = cv.imread('images/kili.jpg')
+    imgAugment = cv.imread('images/soup.jpg')
     
     #captura os frames do video
     fps = int(1000 / video.get(cv.CAP_PROP_FPS))
