@@ -10,7 +10,9 @@ def loadAugmentedImages(path):
     for imgPath in myList:
         key = int(os.path.splitext(imgPath)[0])
         imgAug = cv.imread(f'{path}/{imgPath}')
-        augDict[key] = imgAug
+        augDict[key] = imgAug 
+    print(len(augDict))
+    #o augDict tem as informações da imagem já lida 
     return augDict
 
 def findArucoMarkers(img, markerSize = 7, totalMarkers = 50, draw = True):
@@ -22,10 +24,10 @@ def findArucoMarkers(img, markerSize = 7, totalMarkers = 50, draw = True):
     #retorna as bounding boxes, os ids dos identifiados, e se houver algum detectado e não identificado
     bboxs, ids, rejectedMarkers = aruco.detectMarkers(imgGray, arucoDict, parameters = arucoParam)
     if draw:
-        aruco.drawDetectedMarkers(img, bboxs)
+        aruco.drawDetectedMarkers(img, bboxs, ids)
     return [bboxs, ids]
 
-def augmentAruco(bbox, id, img, imgAugment, drawId = False):
+def augmentAruco(bbox, id, img, imgAugment, drawId = True):
     #define as corners do marcador encontrado
     tl = bbox[0][0][0], bbox[0][0][1]
     tr = bbox[0][1][0], bbox[0][1][1]
@@ -42,12 +44,14 @@ def augmentAruco(bbox, id, img, imgAugment, drawId = False):
     # para fazer o overlay apenas em cima do marcador na imagem original(se não fica tudo preto)
     cv.fillConvexPoly(img, pts1.astype(int), (0,0,0))
     imgOut = img + imgOut
+
     return imgOut
 
 
 def main():
-    video = cv.VideoCapture('images/video3.mp4')
-    augDict = loadAugmentedImages('images')
+    video = cv.VideoCapture('video/video.mp4')
+    # imgAug = cv.imread('images/sheep.jpg')
+    augDict = loadAugmentedImages('n_images')
     
     #captura os frames do video
     fps = int(1000 / video.get(cv.CAP_PROP_FPS))
@@ -60,7 +64,9 @@ def main():
         #loop entre os markers e augmenta cada um
         if len(arucoFound[0]) != 0:
             for bbox, id in zip(arucoFound[0], arucoFound[1]):
-                frame = augmentAruco(bbox, id, frame, augDict[int(id)])
+                dictKeys = augDict.keys()
+                if int(id) in dictKeys:
+                    frame = augmentAruco(bbox, id, frame, augDict[int(id)])
 
         # if video finished or no Video Input
         if not sucess:
