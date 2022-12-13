@@ -4,6 +4,15 @@ import numpy as np
 import os
 import sys
 
+def loadAugmentedImages(path):
+    myList = os.listdir(path)
+    augDict = {}
+    for imgPath in myList:
+        key = int(os.path.splitext(imgPath)[0])
+        imgAug = cv.imread(f'{path}/{imgPath}')
+        augDict[key] = imgAug
+    return augDict
+
 def findArucoMarkers(img, markerSize = 7, totalMarkers = 50, draw = True):
     imgGray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     #cria os atributos para a funcao arucoDict
@@ -29,13 +38,16 @@ def augmentAruco(bbox, id, img, imgAugment, drawId = False):
 
     matrix, _ = cv.findHomography(pts2, pts1)
     imgOut = cv.warpPerspective(imgAugment, matrix, (img.shape[1], img.shape[0]))
-    
+    #pegar na imagem original apenas a parte que tem o marcador e "pinta de preto"
+    # para fazer o overlay apenas em cima do marcador na imagem original(se não fica tudo preto)
+    cv.fillConvexPoly(img, pts1.astype(int), (0,0,0))
+    imgOut = img + imgOut
     return imgOut
 
 
 def main():
-    video = cv.VideoCapture('images/video.mp4')
-    imgAugment = cv.imread('images/soup.jpg')
+    video = cv.VideoCapture('images/video3.mp4')
+    augDict = loadAugmentedImages('images')
     
     #captura os frames do video
     fps = int(1000 / video.get(cv.CAP_PROP_FPS))
@@ -48,7 +60,7 @@ def main():
         #loop entre os markers e augmenta cada um
         if len(arucoFound[0]) != 0:
             for bbox, id in zip(arucoFound[0], arucoFound[1]):
-                frame = augmentAruco(bbox, id, frame, imgAugment)
+                frame = augmentAruco(bbox, id, frame, augDict[int(id)])
 
         # if video finished or no Video Input
         if not sucess:
