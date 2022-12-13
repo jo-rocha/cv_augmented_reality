@@ -12,7 +12,7 @@ def loadAugmentedImages(path):
         imgAug = cv.imread(f'{path}/{imgPath}')
         augDict[key] = imgAug 
     print(len(augDict))
-    #o augDict tem as informações da imagem já lida 
+    #o augDict tem as informações da imagem já lida '1''
     return augDict
 
 def findArucoMarkers(img, markerSize = 7, totalMarkers = 50, draw = True):
@@ -49,9 +49,9 @@ def augmentAruco(bbox, id, img, imgAugment, drawId = True):
 
 
 def main():
-    video = cv.VideoCapture('video/video3.mp4')
+    video = cv.VideoCapture(0)
     # imgAug = cv.imread('images/sheep.jpg')
-    augDict = loadAugmentedImages('n_images')
+    augDict = loadAugmentedImages('referenceImg')
     
     #captura os frames do video
     fps = int(1000 / video.get(cv.CAP_PROP_FPS))
